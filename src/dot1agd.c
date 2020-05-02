@@ -64,9 +64,11 @@ main(int argc, char **argv) {
 	char errbuf[PCAP_ERRBUF_SIZE];
 	struct itimerval tval;
 	struct sigaction act;
+    int skip = 0;
+    int fake_trans = 0;
 
 	/* parse command line options */
-	while ((ch = getopt(argc, argv, "hi:l:v:c:")) != -1) {
+	while ((ch = getopt(argc, argv, "hi:l:v:c:st")) != -1) {
 		switch(ch) {
 		case 'h':
 			usage();
@@ -74,6 +76,12 @@ main(int argc, char **argv) {
 		case 'i':
 			ifname = optarg;
 			break;
+		case 's':
+			skip = 1;
+			break;
+        case 't':
+            fake_trans = 1;
+            break;
 		case '?':
 		default:
 			usage();
@@ -159,6 +167,20 @@ main(int argc, char **argv) {
 			case CFM_CCM:
 				break;
 			case CFM_LBM:
+                if (skip | fake_trans)
+                {
+                    static int i = 1;
+                    i = i ? 0 : 1;
+                    if (i && skip)
+                    {
+                        break;
+                    }
+                    else if (i && fake_trans)
+                    {
+                        cfm_lbm_settransid (404, (uint8_t *) data);
+                    }
+                }
+
 				cfm_send_lbr(ifname, (uint8_t *) data,
 						(int) header->caplen);
 				break;

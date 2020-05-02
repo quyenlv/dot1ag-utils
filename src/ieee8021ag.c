@@ -337,6 +337,13 @@ cfm_ltm_settransid(uint32_t trans_id, uint8_t *buf) {
 	p->transID = htonl(trans_id);
 }
 
+void
+cfm_lbm_settransid (uint32_t trans_id, uint8_t *buf) {
+	struct cfm_lbm *p;
+
+	p = POS_CFM_LBM(buf);
+	p->trans_id = htonl(trans_id);
+}
 
 void
 cfm_addltr(uint32_t transID, uint8_t ttl, uint8_t action, uint8_t *buf) {

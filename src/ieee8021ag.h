@@ -221,6 +221,9 @@ struct cfm_lbm {
 #define POS_CFM_LTM(s)		(struct cfm_ltm *) \
 				(CFMHDR_U8((s),sizeof(struct cfmhdr)))
 
+#define POS_CFM_LBM(s)		(struct cfm_lbm *) \
+				(CFMHDR_U8((s),sizeof(struct cfmhdr)))
+
 #define POS_CFM_LTR(s)		(struct cfm_ltr *) \
 				(CFMHDR_U8((s),sizeof(struct cfmhdr)))
 
@@ -304,6 +307,9 @@ cfm_ltm_setttl(uint8_t ttl, uint8_t *buf);
 
 void
 cfm_ltm_settransid(uint32_t trans_id, uint8_t *buf);
+
+void
+cfm_lbm_settransid (uint32_t trans_id, uint8_t *buf);
 
 void
 cfm_addltr(uint32_t transID, uint8_t ttl, uint8_t action, uint8_t *buf);
