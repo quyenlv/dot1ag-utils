@@ -129,12 +129,13 @@ main(int argc, char **argv) {
 	int facility = LOG_DAEMON;
 	int opts;
 	int verbose = 0;
+    uint8_t rdi = 0;
 
 	/* schedule next CCM to be sent to now */
 	gettimeofday(&next_ccm, NULL);
 
 	/* parse command line options */
-	while ((ch = getopt(argc, argv, "hi:l:m:v:t:d:a:f:V")) != -1) {
+	while ((ch = getopt(argc, argv, "hi:l:m:v:t:d:a:f:Vr")) != -1) {
 		switch(ch) {
 		case 'h':
 			usage();
@@ -166,6 +167,9 @@ main(int argc, char **argv) {
 			break;
 		case 'V':
 			verbose = 1;
+			break;
+		case 'r':
+			rdi = 1;
 			break;
 		case '?':
 		default:
@@ -324,7 +328,7 @@ main(int argc, char **argv) {
 		gettimeofday(&now, NULL);
 		if (cfm_timevalcmp(next_ccm, now, <)) {
 			cfm_ccm_sender(ifname, vlan, mdLevel, md,
-						ma, mepid, CCMinterval);
+						ma, mepid, CCMinterval, rdi);
 			if (CCMinterval >= 1000)  {
 				next_ccm.tv_sec =
 					now.tv_sec + CCMinterval / 1000;
@@ -407,7 +411,7 @@ usage() {
 	fprintf(stderr, "usage: dot1ag_ccd -i interface -t CCM-interval "
 		"-d maintenance-domain -m MEPID "
 		"-a maintenance-association [-v vid] [ -l mdlevel] "
-		"[-f syslog-facility] [-V]\n");
+		"[-f syslog-facility] [-r] [-V]\n");
 	exit(EXIT_FAILURE);
 }
 

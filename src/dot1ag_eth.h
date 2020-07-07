@@ -61,7 +61,7 @@ processLTM(char *ifname, uint8_t *ltm_frame);
 
 void
 cfm_ccm_sender(char *ifname, uint16_t vlan, uint8_t md_level, char *md,
-			char *ma, uint16_t mepid, int interval);
+			char *ma, uint16_t mepid, int interval, uint8_t rdi);
 
 void
 print_ltr(uint8_t *buf);

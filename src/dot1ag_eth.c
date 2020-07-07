@@ -469,7 +469,7 @@ processLTM(char *ifname, uint8_t *ltm_frame) {
 static uint32_t CCIsentCCMs = 0;
 
 void cfm_ccm_sender(char *ifname, uint16_t vlan, uint8_t md_level, char *md,
-				char *ma, uint16_t mepid, int interval) {
+				char *ma, uint16_t mepid, int interval, uint8_t rdi) {
 	uint8_t outbuf[ETHER_MAX_LEN];
 	uint8_t local_mac[ETHER_ADDR_LEN];
 	uint8_t remote_mac[ETHER_ADDR_LEN];
@@ -501,8 +501,9 @@ void cfm_ccm_sender(char *ifname, uint16_t vlan, uint8_t md_level, char *md,
 	cfm_addencap(vlan, local_mac, remote_mac, outbuf, &size);
 	pktsize += size;
         
-	/* RDI in flag field is always set to 0 */
-	flags = 0;
+	/* Set RDI in flag field in the 8th bit */
+	flags = rdi ? 0b10000000 : 0;
+
 	/* least-significant three bits are the CCM Interval */
 	switch (interval) {
 	case 10:
