@@ -469,7 +469,8 @@ processLTM(char *ifname, uint8_t *ltm_frame) {
 static uint32_t CCIsentCCMs = 0;
 
 void cfm_ccm_sender(char *ifname, uint16_t vlan, uint8_t md_level, char *md,
-				char *ma, uint16_t mepid, int interval, uint8_t rdi) {
+                char *ma, uint16_t mepid, int interval, uint8_t rdi,
+                uint8_t tlv_ps, uint8_t tlv_is) {
 	uint8_t outbuf[ETHER_MAX_LEN];
 	uint8_t local_mac[ETHER_ADDR_LEN];
 	uint8_t remote_mac[ETHER_ADDR_LEN];
@@ -602,8 +603,8 @@ void cfm_ccm_sender(char *ifname, uint16_t vlan, uint8_t md_level, char *md,
 	/* minimal length of 1 */
 	*(uint16_t *)(outbuf + pktsize) = htons(1);
 	pktsize += sizeof(uint16_t);
-	/* Port Status, XXX hard code to psUp */
-	*(uint8_t *)(outbuf + pktsize) = DOT1AG_PS_UP;
+	/* Port Status */
+	*(uint8_t *)(outbuf + pktsize) = tlv_ps;
 	pktsize += sizeof(uint8_t);
 
 	/* add Interface Status TLV */
@@ -613,8 +614,8 @@ void cfm_ccm_sender(char *ifname, uint16_t vlan, uint8_t md_level, char *md,
 	/* minimal length of 1 */
 	*(uint16_t *)(outbuf + pktsize) = htons(1);
 	pktsize += sizeof(uint16_t);
-	/* Interface Status, XXX hard code to isUp */
-	*(uint8_t *)(outbuf + pktsize) = DOT1AG_IS_UP;
+	/* Interface Status */
+	*(uint8_t *)(outbuf + pktsize) = tlv_is;
 	pktsize += sizeof(uint8_t);
 
 	/* end packet with End TLV field */

@@ -130,12 +130,14 @@ main(int argc, char **argv) {
 	int opts;
 	int verbose = 0;
     uint8_t rdi = 0;
+    uint8_t tlv_ps = DOT1AG_PS_UP;
+    uint8_t tlv_is = DOT1AG_IS_UP;
 
 	/* schedule next CCM to be sent to now */
 	gettimeofday(&next_ccm, NULL);
 
 	/* parse command line options */
-	while ((ch = getopt(argc, argv, "hi:l:m:v:t:d:a:f:Vr")) != -1) {
+	while ((ch = getopt(argc, argv, "hi:l:m:v:t:d:a:f:VrP:I:")) != -1) {
 		switch(ch) {
 		case 'h':
 			usage();
@@ -170,6 +172,12 @@ main(int argc, char **argv) {
 			break;
 		case 'r':
 			rdi = 1;
+			break;
+		case 'P':
+			tlv_ps = atoi(optarg);
+			break;
+		case 'I':
+			tlv_is = atoi(optarg);
 			break;
 		case '?':
 		default:
@@ -328,7 +336,7 @@ main(int argc, char **argv) {
 		gettimeofday(&now, NULL);
 		if (cfm_timevalcmp(next_ccm, now, <)) {
 			cfm_ccm_sender(ifname, vlan, mdLevel, md,
-						ma, mepid, CCMinterval, rdi);
+						ma, mepid, CCMinterval, rdi, tlv_ps, tlv_is);
 			if (CCMinterval >= 1000)  {
 				next_ccm.tv_sec =
 					now.tv_sec + CCMinterval / 1000;
@@ -408,10 +416,28 @@ main(int argc, char **argv) {
 
 static void
 usage() {
-	fprintf(stderr, "usage: dot1ag_ccd -i interface -t CCM-interval "
-		"-d maintenance-domain -m MEPID "
-		"-a maintenance-association [-v vid] [ -l mdlevel] "
-		"[-f syslog-facility] [-r] [-V]\n");
+	fprintf(stderr,
+            "usage: dot1ag_ccd [-i interface] [-t CCM-interval]\n"
+		    "                  [-d md-name] [-m MEPID] [-a ma-name] [-v vid] [ -l md-level]\n"
+		    "                  [-P port-status] [-I if-status]\n"
+		    "                  [-f syslog-facility] [-r] [-V]\n\n");
+
+    fprintf(stderr, "Arguments:\n"
+        "  -i interface          Interface name to sen out CCM packet\n"
+        "  -t CCM-interval       Set the CCM interval\n"
+        "  -d md-name            Maintenance domain name\n"
+        "  -m MEPID              Maintenance endpoint ID\n"
+        "  -a ma-name            Maintenance association name\n"
+        "  -v vid                VLAN ID\n"
+        "  -l md-level           Maintenance domain level\n"
+        "  -P port-status        TLV Port Status options:\n"
+        "                        0-psNoPortStateTLV 1-psBlocked 2-psUp\n"
+        "  -I if-status          TLV Interface Status options:\n"
+        "                        0-isNoInterfaceStatusTLV 1-isUp 2-isDown 3-isTesting\n"
+        "                        4-isUnknown 5-isDormant 6-isNotPresent 7-isLowerLayerDown\n"
+        "  -f syslog-facility    Syslog facility\n"
+        "  -r                    Enable the RDI bit in CCM packet\n"
+        "  -V                    Enable verbose debug mode\n");
 	exit(EXIT_FAILURE);
 }
 
